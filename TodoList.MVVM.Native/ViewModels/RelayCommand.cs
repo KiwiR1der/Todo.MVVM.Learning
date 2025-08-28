@@ -4,8 +4,8 @@ namespace TodoList.MVVM.Native.ViewModels
 {
     public class RelayCommand : ICommand
     {
-        private readonly Action<object?> _execute;
-        private readonly Predicate<object?> _canExecute;
+        private readonly Action<object?> _execute;  // 执行的委托
+        private readonly Predicate<object?> _canExecute;    // 判断是否可以执行的委托
 
         public RelayCommand(Action<object?> execute, Predicate<object?>? canExecute = null)
         {

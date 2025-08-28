@@ -68,7 +68,7 @@
                     IsEnabled="True" />
             <Button Margin="0,0,8,8"
                     Command="{Binding ToggleCommand}"
-                    Content="切换完成" />
+                    Content="状态切换" />
             <Button Margin="0,0,8,8"
                     Command="{Binding SaveCommand}"
                     Content="保存" />
