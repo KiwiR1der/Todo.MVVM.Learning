@@ -41,7 +41,7 @@ namespace TodoList.MVVM.Native.ViewModels
                     Items.Add(new TodoItem { Title = NewItemTitle, IsDone = false });
                     NewItemTitle = string.Empty;
                 }
-            });
+            },_=> !string.IsNullOrWhiteSpace(NewItemTitle));
 
             RemoveCommand = new RelayCommand(_ =>
             {

@@ -19,6 +19,7 @@
 
         <Style TargetType="Button">
             <Setter Property="FontFamily" Value="HarmonyOS Sans SC" />
+            <Setter Property="Cursor" Value="Hand" />
         </Style>
 
         <Style TargetType="TextBox">
@@ -33,13 +34,14 @@
             <TextBox Width="250"
                      Margin="0,0,8,0"
                      Text="{Binding NewItemTitle, UpdateSourceTrigger=PropertyChanged}" />
-            <Button Width="150"
+            <Button Width="145"
                     Margin="10,0,0,0"
                     Command="{Binding AddCommand}"
                     Content="添加" />
         </StackPanel>
 
-        <ListBox Margin="10"
+        <ListBox Width="340"
+                 Margin="10"
                  ItemsSource="{Binding Items}"
                  SelectedItem="{Binding SelectedItem}">
             <ListBox.ItemTemplate>
