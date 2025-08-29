@@ -94,7 +94,7 @@ namespace TodoList.MVVM.ToolKit.ViewModels
         {
             var newItem = new TodoItem { Title = NewTitle };
 
-            _dbContext.Db.Insertable<TodoItem>(newItem).ExecuteCommand();
+            _dbContext.Db.Insertable<TodoItem>(newItem).ExecuteReturnIdentity();
 
             TodoItems.Add(newItem);
             NewTitle = string.Empty;
@@ -108,7 +108,7 @@ namespace TodoList.MVVM.ToolKit.ViewModels
         [RelayCommand(CanExecute = nameof(CanRemoveItem))]
         private void Remove()
         {
-            _dbContext.Db.Deleteable<TodoItem>().Where(x => x.Id == SelectedTodoItem.Id);
+            _dbContext.Db.Deleteable<TodoItem>().Where(x => x.Id == SelectedTodoItem.Id).ExecuteCommand();
 
             TodoItems.Remove(SelectedTodoItem);
             SelectedTodoItem = null;
@@ -121,7 +121,7 @@ namespace TodoList.MVVM.ToolKit.ViewModels
             _dbContext.Db.Updateable(selectedTodoItem).ExecuteCommand();
         }
 
-        private bool CanRemoveItem => SelectedTodoItem != null;
+        private bool CanRemoveItem() => SelectedTodoItem != null;
 
         [RelayCommand]
         private void Save()
