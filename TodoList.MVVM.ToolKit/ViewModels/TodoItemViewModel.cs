@@ -1,37 +1,82 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Text.Json;
+using System.Windows.Data;
 using TodoList.MVVM.ToolKit.Models;
 
 namespace TodoList.MVVM.ToolKit.ViewModels
 {
     public partial class TodoItemViewModel : ViewModelBase
     {
-        public ObservableCollection<TodoItem> TodoItems { get; } = new();
+        private ObservableCollection<TodoItem> TodoItems { get; } = new();
+        public ICollectionView TodoItemsView { get; }
 
-        // 选中项变化会影响“删除”是否可点
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(RemoveCommand))]
         private TodoItem? selectedTodoItem;
 
-        // 文本变化会影响“添加”是否可点
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(AddCommand))]
         private string newTitle = string.Empty;
 
-        //[ObservableProperty]
-        //private TodoItem _selectedTodoItem = null;
-
-        //[ObservableProperty]
-        //private string _newTitle = string.Empty;
-
         private readonly string _dataFile = "todoItems.json";
+
+        // 筛选
+
+        [ObservableProperty]
+        private bool _showAllItems = true;
+
+        [ObservableProperty]
+        private bool _showCompletedItems;
+
+        [ObservableProperty]
+        private bool _showPendingItems;
 
         public TodoItemViewModel()
         {
             Load();
+            TodoItemsView = CollectionViewSource.GetDefaultView(TodoItems);
+        }
+
+        [RelayCommand]
+        private void ApplyFilter()
+        {
+            TodoItemsView.Filter = item =>
+            {
+                if (item is not TodoItem todo) return false;
+
+                if (ShowAllItems) return true;
+                if (ShowCompletedItems && todo.IsDone) return true;
+                if (ShowPendingItems && !todo.IsDone) return true;
+
+                return false;
+            };
+        }
+
+        // 排序
+
+        [RelayCommand]
+        private void SortByTitle()
+        {
+            TodoItemsView.SortDescriptions.Clear();
+            TodoItemsView.SortDescriptions.Add(new SortDescription(nameof(TodoItem.Title), ListSortDirection.Ascending));
+        }
+
+        [RelayCommand]
+        private void SortByDueDate()
+        {
+            TodoItemsView.SortDescriptions.Clear();
+            TodoItemsView.SortDescriptions.Add(new SortDescription(nameof(TodoItem.DueDate), ListSortDirection.Ascending));
+        }
+
+        [RelayCommand]
+        private void SortByStatus()
+        {
+            TodoItemsView.SortDescriptions.Clear();
+            TodoItemsView.SortDescriptions.Add(new SortDescription(nameof(TodoItem.IsDone), ListSortDirection.Ascending));
         }
 
         // 添加命令
@@ -46,8 +91,6 @@ namespace TodoList.MVVM.ToolKit.ViewModels
         {
             return !string.IsNullOrWhiteSpace(NewTitle);
         }
-
-        //private bool CanAddItem => !string.IsNullOrEmpty(NewTitle);
 
         [RelayCommand(CanExecute = nameof(CanRemoveItem))]
         private void Remove()

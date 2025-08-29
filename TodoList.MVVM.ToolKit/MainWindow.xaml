@@ -1,14 +1,15 @@
 ﻿<Window x:Class="TodoList.MVVM.ToolKit.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:converter="clr-namespace:TodoList.MVVM.ToolKit.Converters"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:local="clr-namespace:TodoList.MVVM.ToolKit"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:TodoList.MVVM.ToolKit.ViewModels"
         Title="MainWindow"
-        Width="400"
-        Height="450"
+        Width="560"
+        Height="480"
         d:DataContext="{d:DesignInstance Type=vm:TodoItemViewModel}"
         WindowStartupLocation="CenterScreen"
         mc:Ignorable="d">
@@ -17,17 +18,36 @@
         <vm:TodoItemViewModel />
     </Window.DataContext>-->
 
+    <Window.Resources>
+        <converter:HumanizerDateTimeConvert x:Key="HumanizerDateTimeConverter" />
+    </Window.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="8*" />
-            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="7*" />
+            <ColumnDefinition Width="3*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="1*" />
             <RowDefinition Height="9*" />
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
-        <ListBox Margin="2,2,2,2"
-                 ItemsSource="{Binding TodoItems}"
+
+        <UniformGrid Margin="10,0,10,0" Columns="3">
+            <RadioButton Command="{Binding ApplyFilterCommand}"
+                         Content="全部"
+                         IsChecked="{Binding ShowAllItems}" />
+            <RadioButton Command="{Binding ApplyFilterCommand}"
+                         Content="已完成"
+                         IsChecked="{Binding ShowCompletedItems}" />
+            <RadioButton Command="{Binding ApplyFilterCommand}"
+                         Content="待完成"
+                         IsChecked="{Binding ShowPendingItems}" />
+        </UniformGrid>
+
+        <ListBox Grid.Row="1"
+                 Margin="2,2,2,2"
+                 ItemsSource="{Binding TodoItemsView}"
                  SelectedItem="{Binding SelectedTodoItem}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
@@ -35,17 +55,35 @@
                         <CheckBox Margin="0,0,10,0"
                                   VerticalAlignment="Center"
                                   IsChecked="{Binding IsDone}" />
-                        <TextBlock VerticalAlignment="Center" Text="{Binding Title}" />
+                        <TextBlock Margin="0,0,10,0"
+                                   VerticalAlignment="Center"
+                                   Text="{Binding Title}" />
+                        <TextBlock VerticalAlignment="Center" Text="{Binding DueDate, Converter={StaticResource HumanizerDateTimeConverter}}" />
                     </DockPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <UniformGrid Grid.Row="0"
+        <UniformGrid Grid.Row="1"
                      Grid.Column="1"
-                     Rows="3">
+                     Rows="8">
+            <Button Command="{Binding SortByTitleCommand}"
+                    Content="按标题排序"
+                    Style="{StaticResource ButtonPrimary}" />
+            <Button Command="{Binding SortByDueDateCommand}"
+                    Content="按截止日期排序"
+                    Style="{StaticResource ButtonPrimary}" />
+            <Button Command="{Binding SortByStatusCommand}"
+                    Content="按状态排序"
+                    Style="{StaticResource ButtonPrimary}" />
+
+            <Separator />
+
             <Button Command="{Binding RemoveCommand}"
                     Content="移除"
                     Style="{StaticResource ButtonPrimary}" />
+
+            <Separator />
+
             <Button Command="{Binding SaveCommand}"
                     Content="保存"
                     Style="{StaticResource ButtonPrimary}" />
@@ -54,12 +92,12 @@
                     Style="{StaticResource ButtonPrimary}" />
         </UniformGrid>
 
-        <TextBox Grid.Row="1"
+        <TextBox Grid.Row="2"
                  Grid.Column="0"
                  Margin="2,2,2,2"
                  Text="{Binding NewTitle, UpdateSourceTrigger=PropertyChanged}" />
 
-        <Button Grid.Row="1"
+        <Button Grid.Row="2"
                 Grid.Column="1"
                 Command="{Binding AddCommand}"
                 Content="添加"

@@ -9,5 +9,8 @@ namespace TodoList.MVVM.ToolKit.Models
 
         [ObservableProperty]
         private bool _isDone = false;
+
+        [ObservableProperty]
+        private DateTimeOffset _dueDate = DateTime.Now.AddDays(1);
     }
 }
