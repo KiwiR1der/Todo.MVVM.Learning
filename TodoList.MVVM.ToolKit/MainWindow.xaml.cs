@@ -8,10 +8,11 @@ namespace TodoList.MVVM.ToolKit
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        public MainWindow(TodoItemViewModel viewModel)
         {
             InitializeComponent();
-            this.DataContext = new TodoItemViewModel();
+
+            this.DataContext = viewModel;
         }
     }
 }

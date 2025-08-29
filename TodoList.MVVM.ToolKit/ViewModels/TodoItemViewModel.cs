@@ -2,20 +2,22 @@
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
-using System.Text.Json;
 using System.Windows.Data;
 using TodoList.MVVM.ToolKit.Models;
+using TodoList.MVVM.ToolKit.Services;
 
 namespace TodoList.MVVM.ToolKit.ViewModels
 {
     public partial class TodoItemViewModel : ViewModelBase
     {
+        private readonly TodoDbContext _dbContext;
+
         private ObservableCollection<TodoItem> TodoItems { get; } = new();
         public ICollectionView TodoItemsView { get; }
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(RemoveCommand))]
+        [NotifyCanExecuteChangedFor(nameof(UpdateItemStatusCommand))]
         private TodoItem? selectedTodoItem;
 
         [ObservableProperty]
@@ -35,11 +37,18 @@ namespace TodoList.MVVM.ToolKit.ViewModels
         [ObservableProperty]
         private bool _showPendingItems;
 
-        public TodoItemViewModel()
+        public TodoItemViewModel(TodoDbContext dbContext)
         {
-            Load();
+            _dbContext = dbContext;
             TodoItemsView = CollectionViewSource.GetDefaultView(TodoItems);
+            Load();
         }
+
+        //public TodoItemViewModel()
+        //{
+        //    Load();
+        //    TodoItemsView = CollectionViewSource.GetDefaultView(TodoItems);
+        //}
 
         [RelayCommand]
         private void ApplyFilter()
@@ -83,7 +92,11 @@ namespace TodoList.MVVM.ToolKit.ViewModels
         [RelayCommand(CanExecute = nameof(CanAddItem))]
         private void Add()
         {
-            TodoItems.Add(new TodoItem { Title = NewTitle });
+            var newItem = new TodoItem { Title = NewTitle };
+
+            _dbContext.Db.Insertable<TodoItem>(newItem).ExecuteCommand();
+
+            TodoItems.Add(newItem);
             NewTitle = string.Empty;
         }
 
@@ -95,8 +108,17 @@ namespace TodoList.MVVM.ToolKit.ViewModels
         [RelayCommand(CanExecute = nameof(CanRemoveItem))]
         private void Remove()
         {
+            _dbContext.Db.Deleteable<TodoItem>().Where(x => x.Id == SelectedTodoItem.Id);
+
             TodoItems.Remove(SelectedTodoItem);
             SelectedTodoItem = null;
+        }
+
+        [RelayCommand(CanExecute = nameof(CanRemoveItem))]
+        private void UpdateItemStatus()
+        {
+            selectedTodoItem.IsDone = !selectedTodoItem.IsDone;
+            _dbContext.Db.Updateable(selectedTodoItem).ExecuteCommand();
         }
 
         private bool CanRemoveItem => SelectedTodoItem != null;
@@ -104,32 +126,23 @@ namespace TodoList.MVVM.ToolKit.ViewModels
         [RelayCommand]
         private void Save()
         {
-            var dump = TodoItems.Select(i => new { i.Title, i.IsDone }).ToList();
-            File.WriteAllText(_dataFile, JsonSerializer.Serialize(dump, new JsonSerializerOptions { WriteIndented = true }));
+            // SQLite 数据库会持久化，此处不需要额外保存操作
+            // 但可以添加批量更新或其他业务逻辑
+
+            return;
+
         }
 
         [RelayCommand]
         private void Load()
         {
-            if (!File.Exists(_dataFile))
-            {
-                return;
-            }
+            // 从数据库中加载所有 TodoItem
+            var items = _dbContext.Db.Queryable<TodoItem>().ToList();
 
-            try
+            TodoItems.Clear();
+            foreach (var item in items)
             {
-                var json = JsonSerializer.Deserialize<List<TodoItem>>(File.ReadAllText(_dataFile));
-                if (json == null)
-                    return;
-                TodoItems.Clear();
-                foreach (var item in json)
-                {
-                    TodoItems.Add(new TodoItem { Title = item.Title, IsDone = item.IsDone });
-                }
-            }
-            catch (Exception)
-            {
-                // ignore
+                TodoItems.Add(item);
             }
         }
     }
