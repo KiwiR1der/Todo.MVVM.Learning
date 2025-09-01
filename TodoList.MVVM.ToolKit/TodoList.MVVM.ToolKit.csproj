@@ -16,8 +16,4 @@
     <PackageReference Include="SqlSugarCore" Version="5.1.4.200" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Views\" />
-  </ItemGroup>
-
 </Project>

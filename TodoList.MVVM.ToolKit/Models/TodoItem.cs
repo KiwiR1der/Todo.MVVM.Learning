@@ -19,6 +19,6 @@ namespace TodoList.MVVM.ToolKit.Models
 
         [property: SugarColumn]
         [ObservableProperty]
-        private DateTimeOffset _dueDate = DateTime.Now.AddDays(1);
+        private DateTime _dueDate = DateTime.Now.AddDays(1);
     }
 }

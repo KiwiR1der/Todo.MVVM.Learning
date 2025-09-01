@@ -65,7 +65,7 @@
         </ListBox>
         <UniformGrid Grid.Row="1"
                      Grid.Column="1"
-                     Rows="9">
+                     Rows="10">
             <Button Command="{Binding SortByTitleCommand}"
                     Content="按标题排序"
                     Style="{StaticResource ButtonPrimary}" />
@@ -80,6 +80,10 @@
 
             <Button Command="{Binding UpdateItemStatusCommand}"
                     Content="切换状态"
+                    Style="{StaticResource ButtonPrimary}" />
+
+            <Button Command="{Binding EditCommand}"
+                    Content="编辑"
                     Style="{StaticResource ButtonPrimary}" />
 
             <Button Command="{Binding RemoveCommand}"

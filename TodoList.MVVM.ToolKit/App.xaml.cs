@@ -22,6 +22,7 @@ namespace TodoList.MVVM.ToolKit
             // 注册服务
             services.AddSingleton<TodoDbContext>();
             services.AddSingleton<TodoItemViewModel>();
+            services.AddSingleton<IDialogService, EditTodoDialogService>();
 
             // 注册主窗口
             services.AddTransient<MainWindow>();

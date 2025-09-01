@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using HandyControl.Controls;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Data;
@@ -11,6 +12,7 @@ namespace TodoList.MVVM.ToolKit.ViewModels
     public partial class TodoItemViewModel : ViewModelBase
     {
         private readonly TodoDbContext _dbContext;
+        private readonly IDialogService _dialogs;
 
         private ObservableCollection<TodoItem> TodoItems { get; } = new();
         public ICollectionView TodoItemsView { get; }
@@ -18,6 +20,7 @@ namespace TodoList.MVVM.ToolKit.ViewModels
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(RemoveCommand))]
         [NotifyCanExecuteChangedFor(nameof(UpdateItemStatusCommand))]
+        [NotifyCanExecuteChangedFor(nameof(EditCommand))]
         private TodoItem? selectedTodoItem;
 
         [ObservableProperty]
@@ -37,9 +40,10 @@ namespace TodoList.MVVM.ToolKit.ViewModels
         [ObservableProperty]
         private bool _showPendingItems;
 
-        public TodoItemViewModel(TodoDbContext dbContext)
+        public TodoItemViewModel(TodoDbContext dbContext, IDialogService dialogs)
         {
             _dbContext = dbContext;
+            _dialogs = dialogs;
             TodoItemsView = CollectionViewSource.GetDefaultView(TodoItems);
             Load();
         }
@@ -92,12 +96,47 @@ namespace TodoList.MVVM.ToolKit.ViewModels
         [RelayCommand(CanExecute = nameof(CanAddItem))]
         private void Add()
         {
-            var newItem = new TodoItem { Title = NewTitle };
+            var vm = new EditTodoItemViewModel(isEdit: false)
+            {
+                Title = NewTitle,
+                IsDone = false,
+                DueDate = DateTime.Now.AddDays(1)
+            };
 
-            _dbContext.Db.Insertable<TodoItem>(newItem).ExecuteReturnIdentity();
+            if (_dialogs.ShowEditTodoDialog(vm))
+            {
+                var entity = new TodoItem { Title = vm.Title, IsDone = vm.IsDone, DueDate = vm.DueDate };
+                entity = _dbContext.Db.Insertable(entity).ExecuteReturnEntity();
+                TodoItems.Add(entity);
+                NewTitle = string.Empty;
+            }
 
-            TodoItems.Add(newItem);
-            NewTitle = string.Empty;
+            //var newItem = new TodoItem { Title = NewTitle };
+
+            //_dbContext.Db.Insertable<TodoItem>(newItem).ExecuteReturnIdentity();
+
+            //TodoItems.Add(newItem);
+            //NewTitle = string.Empty;
+        }
+
+        [RelayCommand(CanExecute = nameof(CanModifyItem))]
+        private void Edit()
+        {
+            var vm = new EditTodoItemViewModel(isEdit: true)
+            {
+                Title = SelectedTodoItem.Title,
+                IsDone = SelectedTodoItem.IsDone,
+                DueDate = SelectedTodoItem.DueDate
+            };
+
+            if (_dialogs.ShowEditTodoDialog(vm))
+            {
+                SelectedTodoItem.Title = vm.Title;
+                SelectedTodoItem.IsDone = vm.IsDone;
+                SelectedTodoItem.DueDate = vm.DueDate;
+
+                _dbContext.Db.Updateable(SelectedTodoItem).ExecuteCommand();
+            }
         }
 
         private bool CanAddItem()
@@ -105,7 +144,7 @@ namespace TodoList.MVVM.ToolKit.ViewModels
             return !string.IsNullOrWhiteSpace(NewTitle);
         }
 
-        [RelayCommand(CanExecute = nameof(CanRemoveItem))]
+        [RelayCommand(CanExecute = nameof(CanModifyItem))]
         private void Remove()
         {
             _dbContext.Db.Deleteable<TodoItem>().Where(x => x.Id == SelectedTodoItem.Id).ExecuteCommand();
@@ -114,14 +153,14 @@ namespace TodoList.MVVM.ToolKit.ViewModels
             SelectedTodoItem = null;
         }
 
-        [RelayCommand(CanExecute = nameof(CanRemoveItem))]
+        [RelayCommand(CanExecute = nameof(CanModifyItem))]
         private void UpdateItemStatus()
         {
             selectedTodoItem.IsDone = !selectedTodoItem.IsDone;
             _dbContext.Db.Updateable(selectedTodoItem).ExecuteCommand();
         }
 
-        private bool CanRemoveItem() => SelectedTodoItem != null;
+        private bool CanModifyItem() => SelectedTodoItem != null;
 
         [RelayCommand]
         private void Save()

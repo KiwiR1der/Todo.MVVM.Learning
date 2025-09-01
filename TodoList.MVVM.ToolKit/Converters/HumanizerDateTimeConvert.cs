@@ -8,9 +8,14 @@ namespace TodoList.MVVM.ToolKit.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is DateTimeOffset dateTime)
+            if (value is DateTime dateTime)
             {
                 return dateTime.Humanize();
+            }
+
+            if (value is DateTimeOffset dateTimeOffset)
+            {
+                return dateTimeOffset.Humanize();
             }
 
             return value?.ToString() ?? string.Empty;
