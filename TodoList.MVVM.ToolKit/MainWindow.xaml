@@ -28,12 +28,15 @@
             <ColumnDefinition Width="3*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*" />
+            <RowDefinition Height="2*" />
             <RowDefinition Height="9*" />
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
 
-        <UniformGrid Margin="10,0,10,0" Columns="3">
+        <UniformGrid Grid.ColumnSpan="2"
+                     Margin="10,0,10,0"
+                     Columns="3"
+                     Rows="2">
             <RadioButton Command="{Binding ApplyFilterCommand}"
                          Content="全部"
                          IsChecked="{Binding ShowAllItems}" />
@@ -43,6 +46,15 @@
             <RadioButton Command="{Binding ApplyFilterCommand}"
                          Content="待完成"
                          IsChecked="{Binding ShowPendingItems}" />
+            <Button Command="{Binding SortByTitleCommand}"
+                    Content="按标题排序"
+                    Style="{StaticResource ButtonPrimary}" />
+            <Button Command="{Binding SortByDueDateCommand}"
+                    Content="按截止日期排序"
+                    Style="{StaticResource ButtonPrimary}" />
+            <Button Command="{Binding SortByStatusCommand}"
+                    Content="按状态排序"
+                    Style="{StaticResource ButtonPrimary}" />
         </UniformGrid>
 
         <ListBox Grid.Row="1"
@@ -65,18 +77,7 @@
         </ListBox>
         <UniformGrid Grid.Row="1"
                      Grid.Column="1"
-                     Rows="10">
-            <Button Command="{Binding SortByTitleCommand}"
-                    Content="按标题排序"
-                    Style="{StaticResource ButtonPrimary}" />
-            <Button Command="{Binding SortByDueDateCommand}"
-                    Content="按截止日期排序"
-                    Style="{StaticResource ButtonPrimary}" />
-            <Button Command="{Binding SortByStatusCommand}"
-                    Content="按状态排序"
-                    Style="{StaticResource ButtonPrimary}" />
-
-            <Separator />
+                     Rows="6">
 
             <Button Command="{Binding UpdateItemStatusCommand}"
                     Content="切换状态"

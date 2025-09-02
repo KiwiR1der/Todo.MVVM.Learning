@@ -20,5 +20,17 @@ namespace TodoList.MVVM.ToolKit.Models
         [property: SugarColumn]
         [ObservableProperty]
         private DateTime _dueDate = DateTime.Now.AddDays(1);
+
+        [property: SugarColumn]
+        [ObservableProperty]
+        private bool _reminderEnabled = true;
+
+        [property: SugarColumn]
+        [ObservableProperty]
+        private int _reminderBeforeMinutes = 15;
+
+        [property: SugarColumn]
+        [ObservableProperty]
+        private DateTime? _lastReminderDate = null;
     }
 }

@@ -23,11 +23,17 @@ namespace TodoList.MVVM.ToolKit
             services.AddSingleton<TodoDbContext>();
             services.AddSingleton<TodoItemViewModel>();
             services.AddSingleton<IDialogService, EditTodoDialogService>();
+            services.AddSingleton<INotificationService, NotificationService>();
+            services.AddSingleton<IReminderService, ReminderServie>();
 
             // 注册主窗口
             services.AddTransient<MainWindow>();
 
             ServiceProvider = services.BuildServiceProvider();
+            
+            // 启动提醒服务
+            var reminderService = ServiceProvider.GetRequiredService<IReminderService>();
+            reminderService.Start();
 
             // 显示主窗口
             var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();

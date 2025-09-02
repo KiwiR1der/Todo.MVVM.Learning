@@ -7,20 +7,22 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         Title="EditTodoWindow"
         Width="400"
-        Height="232"
+        Height="320"
         WindowStartupLocation="CenterScreen"
         mc:Ignorable="d">
 
     <Grid Margin="16">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="3*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0"
                    Grid.Column="0"
@@ -38,10 +40,10 @@
                    Margin="0,0,8,8"
                    VerticalAlignment="Center"
                    Text="截止日期：" />
-        <DatePicker Grid.Row="1"
-                    Grid.Column="1"
-                    Margin="0,0,0,8"
-                    SelectedDate="{Binding DueDate, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
+        <hc:DateTimePicker Grid.Row="1"
+                           Grid.Column="1"
+                           Margin="0,0,0,8"
+                           SelectedDateTime="{Binding DueDate, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
 
         <TextBlock Grid.Row="2"
                    Grid.Column="0"
@@ -54,20 +56,32 @@
                   Content="已完成"
                   IsChecked="{Binding IsDone, Mode=TwoWay}" />
 
-        <StackPanel Grid.Row="3"
-                    Grid.ColumnSpan="2"
-                    HorizontalAlignment="Right"
-                    Orientation="Horizontal">
-            <Button Width="88"
-                    Margin="0,8,8,0"
-                    Click="Button_Click"
+        <CheckBox Grid.Row="3"
+                  Grid.Column="0"
+                  Content="开启提醒"
+                  IsChecked="{Binding ReminderEnabled}" />
+
+        <TextBox Grid.Row="3"
+                 Grid.Column="1"
+                 hc:InfoElement.Title="提前提醒时间（分钟）"
+                 hc:InfoElement.TitlePlacement="Top"
+                 Style="{StaticResource TextBoxExtend}"
+                 Text="{Binding ReminderBeforeMinutes}" />
+
+        <UniformGrid Grid.Row="4"
+                     Grid.ColumnSpan="2"
+                     Margin="5"
+                     Columns="2">
+            <Button Click="Button_Click"
                     Command="{Binding OKCommand}"
                     Content="确定"
-                    IsDefault="True" />
-            <Button Width="88"
-                    Margin="0,8,8,0"
-                    Content="取消"
-                    IsCancel="True" />
-        </StackPanel>
+                    Cursor="Hand"
+                    IsDefault="True"
+                    Style="{StaticResource ButtonPrimary}" />
+            <Button Content="取消"
+                    Cursor="Hand"
+                    IsCancel="True"
+                    Style="{StaticResource ButtonPrimary}" />
+        </UniformGrid>
     </Grid>
 </Window>

@@ -100,12 +100,19 @@ namespace TodoList.MVVM.ToolKit.ViewModels
             {
                 Title = NewTitle,
                 IsDone = false,
-                DueDate = DateTime.Now.AddDays(1)
+                DueDate = DateTime.Now.AddDays(1),
             };
 
             if (_dialogs.ShowEditTodoDialog(vm))
             {
-                var entity = new TodoItem { Title = vm.Title, IsDone = vm.IsDone, DueDate = vm.DueDate };
+                var entity = new TodoItem
+                {
+                    Title = vm.Title,
+                    IsDone = vm.IsDone,
+                    DueDate = vm.DueDate,
+                    ReminderEnabled = vm.ReminderEnabled,
+                    ReminderBeforeMinutes = vm.ReminderBeforeMinutes
+                };
                 entity = _dbContext.Db.Insertable(entity).ExecuteReturnEntity();
                 TodoItems.Add(entity);
                 NewTitle = string.Empty;
@@ -126,7 +133,9 @@ namespace TodoList.MVVM.ToolKit.ViewModels
             {
                 Title = SelectedTodoItem.Title,
                 IsDone = SelectedTodoItem.IsDone,
-                DueDate = SelectedTodoItem.DueDate
+                DueDate = SelectedTodoItem.DueDate,
+                ReminderEnabled = SelectedTodoItem.ReminderEnabled,
+                ReminderBeforeMinutes = SelectedTodoItem.ReminderBeforeMinutes
             };
 
             if (_dialogs.ShowEditTodoDialog(vm))
@@ -134,6 +143,8 @@ namespace TodoList.MVVM.ToolKit.ViewModels
                 SelectedTodoItem.Title = vm.Title;
                 SelectedTodoItem.IsDone = vm.IsDone;
                 SelectedTodoItem.DueDate = vm.DueDate;
+                SelectedTodoItem.ReminderEnabled = vm.ReminderEnabled;
+                SelectedTodoItem.ReminderBeforeMinutes = vm.ReminderBeforeMinutes;
 
                 _dbContext.Db.Updateable(SelectedTodoItem).ExecuteCommand();
             }

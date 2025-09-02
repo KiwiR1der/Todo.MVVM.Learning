@@ -10,7 +10,7 @@ namespace TodoList.MVVM.ToolKit.Converters
         {
             if (value is DateTime dateTime)
             {
-                return dateTime.Humanize();
+                return dateTime.Humanize(false);
             }
 
             if (value is DateTimeOffset dateTimeOffset)

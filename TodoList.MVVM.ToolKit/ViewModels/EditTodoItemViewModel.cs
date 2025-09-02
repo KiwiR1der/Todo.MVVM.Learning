@@ -18,6 +18,15 @@ namespace TodoList.MVVM.ToolKit.ViewModels
         [ObservableProperty] private bool isDone;
         [ObservableProperty] private DateTime dueDate = DateTime.Today;
 
+        [ObservableProperty]
+        private bool reminderEnabled = true;
+
+        [ObservableProperty]
+        private int reminderBeforeMinutes = 15;
+
+        [ObservableProperty]
+        private DateTime? lastReminderDate = null;
+
         public EditTodoItemViewModel(bool isEdit)
         {
             IsEdit = isEdit;
@@ -31,6 +40,5 @@ namespace TodoList.MVVM.ToolKit.ViewModels
             // 真正的“关闭窗体并返回结果”在 View 中设置
             // 这是不做事
         }
-
     }
 }
